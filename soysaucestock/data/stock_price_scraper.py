@@ -8,7 +8,7 @@ stock_chart_url = 'https://stockcharts.com/scripts/php/dblogin.php'
 
 
 def get_stock_chart_login_from_config():
-    return {'form_UserID': 'boyuhou@gmail.com', 'form_UserPassword': 'ilovekathy'}
+    return {'form_UserID': 'boyuhou@gmail.com', 'form_UserPassword': 'thisisatest'}
 
 
 class StockChartScraper(object):
