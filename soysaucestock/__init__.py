@@ -1,6 +1,9 @@
 from lxml import html
 import requests
-import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 import pandas as pd
 import csv
 
@@ -15,7 +18,7 @@ if __name__ == '__main__':
     a = tree.xpath('//div[@id="historic-data-body"]/pre/text()')
     s.close()
 
-    io = StringIO.StringIO(a[0])
+    io = StringIO(a[0])
     f = open('data.csv', 'wt')
 
     try:
@@ -25,9 +28,14 @@ if __name__ == '__main__':
             i += 1
             if i not in [1, 3]:
                 line = line.split()
-                writer.writerow(line[1:-1])
+                writer.writerow(line[1:len(line)])
 
     finally:
         f.close()
     df = pd.DataFrame.from_csv('data.csv', sep=",", parse_dates=True)
-    df.sort_index(ascending=True, axis=0)
+    df = df.sort_index(ascending=True, axis=0)
+
+    store = pd.HDFStore('data.h5')
+    store['price/RY_TO'] = df
+    store.close()
+    #ry = pd.read_hdf('data.h5', 'price/RY_TO')

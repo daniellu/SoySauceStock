@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{92a0d4a2-2eb9-4674-9f5c-a4c82fe3120f}</ProjectGuid>
     <ProjectHome />
-    <StartupFile />
+    <StartupFile>soysaucestock\__init__.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
