@@ -15,27 +15,23 @@ if __name__ == '__main__':
     s.post(url, data=stockchartlogin)
     page = s.get('http://stockcharts.com/h-hd/?RY.TO')
     tree = html.fromstring(page.content)
-    a = tree.xpath('//div[@id="historic-data-body"]/pre/text()')
+    priceTablePart = tree.xpath('//div[@id="historic-data-body"]/pre/text()')
     s.close()
 
-    io = StringIO(a[0])
-    f = open('data.csv', 'wt')
-
-    try:
-        writer = csv.writer(f)
-        i = 0
-        for line in io:
-            i += 1
-            if i not in [1, 3]:
-                line = line.split()
-                writer.writerow(line[1:len(line)])
-
-    finally:
-        f.close()
-    df = pd.DataFrame.from_csv('data.csv', sep=",", parse_dates=True)
-    df = df.sort_index(ascending=True, axis=0)
+	tableLines = priceTablePart[0].splitlines()
+	#we only want data after the first 3 rows, splict data into array of array
+    lineArray = []
+    index = 0;
+    for tableRow in tableLines:
+        index += 1
+        if index not in [1, 3]:
+            cells = tableRow.split()[1:]
+            lineArray.append(cells)
+    print(lineArray[0])
+    dataFrameFromRecord = pd.DataFrame.from_records(lineArray)
+    dataFrameFromRecord.sort_index(ascending=True, axis=0)
 
     store = pd.HDFStore('data.h5')
-    store['price/RY_TO'] = df
+    store['price/RY_TO'] = dataFrameFromRecord
     store.close()
     #ry = pd.read_hdf('data.h5', 'price/RY_TO')
