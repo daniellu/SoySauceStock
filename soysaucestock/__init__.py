@@ -1,4 +1,5 @@
 from lxml import html
+import time
 import requests
 try:
     from StringIO import StringIO
@@ -8,7 +9,8 @@ import pandas as pd
 import csv
 
 url = 'https://stockcharts.com/scripts/php/dblogin.php'
-stockchartlogin = {'form_UserID':'boyuhou@gmail.com','form_UserPassword':'thisisatest'}
+stockchartlogin = {'form_UserID': 'YOUR_USERNAME@gmail.com', 'form_UserPassword': 'YOUR_PASSWORD'}
+
 
 if __name__ == '__main__':
     s = requests.Session()
@@ -18,20 +20,47 @@ if __name__ == '__main__':
     priceTablePart = tree.xpath('//div[@id="historic-data-body"]/pre/text()')
     s.close()
 
-	tableLines = priceTablePart[0].splitlines()
-	#we only want data after the first 3 rows, splict data into array of array
-    lineArray = []
-    index = 0;
-    for tableRow in tableLines:
-        index += 1
-        if index not in [1, 3]:
-            cells = tableRow.split()[1:]
-            lineArray.append(cells)
-    print(lineArray[0])
-    dataFrameFromRecord = pd.DataFrame.from_records(lineArray)
-    dataFrameFromRecord.sort_index(ascending=True, axis=0)
+    tableLines = priceTablePart[0].splitlines()
+    #we only want data after the first 3 rows, split data into array of array
+    #lineArray = [tableRow.split() for tableRow in tableLines[3:]]
 
-    store = pd.HDFStore('data.h5')
-    store['price/RY_TO'] = dataFrameFromRecord
-    store.close()
+    lineArray = []
+    index = 0
+	#remove the empty lines
+    for tableRow in filter(None, tableLines):
+        index += 1
+        if index not in [1, 2, 3]:
+            cells = tableRow.split()[1:]
+            #Do I need to parse to date type for the first column? Disable now
+            #parsedDateTimeValue = time.strptime(cells[0], "%m-%d-%Y")
+            #cells[0] = parsedDateTimeValue
+            lineArray.append(cells)
+    
+    dataFrameFromRecord = pd.DataFrame.from_records(lineArray, columns=['Date', 'Open', 'High', 'Low', 'Close', 'Volume'])
+    dataFrameFromRecord.sort_index(ascending=True, axis=1)
+
+    io = StringIO(priceTablePart[0])
+    f = open('data.csv', 'wt')
+
+    try:
+        writer = csv.writer(f)
+        i = 0
+        for line in io:
+            i += 1
+            if i not in [1, 3]:
+                line = line.split()
+                writer.writerow(line[1:len(line)])
+
+    finally:
+        f.close()
+    df = pd.DataFrame.from_csv('data.csv', sep=",", parse_dates=True)
+
+	
+	#save both data frames to csv to validate if the data is correct, data identified
+    dataFrameFromRecord.to_csv('dataFromMemory.csv', index=False)
+    df.to_csv('df_FromCSV.csv')
+	
+    #store = pd.HDFStore('data.h5')
+    #store['price/RY_TO'] = df
+    #store.close()
     #ry = pd.read_hdf('data.h5', 'price/RY_TO')
