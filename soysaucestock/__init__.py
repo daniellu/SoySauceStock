@@ -7,26 +7,20 @@ except ImportError:
     from io import StringIO
 import pandas as pd
 import csv
+import stock_price_scraper
 
 url = 'https://stockcharts.com/scripts/php/dblogin.php'
 stockchartlogin = {'form_UserID': 'YOUR_USERNAME@gmail.com', 'form_UserPassword': 'YOUR_PASSWORD'}
 
+
 if __name__ == '__main__':
-    s = requests.Session()
-    s.post(url, data=stockchartlogin)
-    page = s.get('http://stockcharts.com/h-hd/?RY.TO')
-    tree = html.fromstring(page.content)
-    priceTablePart = tree.xpath('//div[@id="historic-data-body"]/pre/text()')
-    s.close()
 
-    tableLines = priceTablePart[0].splitlines()
-    #we only want data after the first 3 rows, split data into array of array
-    lineArray = [tableRow.split()[1:] for tableRow in filter(None, tableLines[3:])]
+    scraper = stock_price_scraper.StockChartScraper(stock_list=[], login_config=stockchartlogin)
+    session = scraper.login_stock_chart_site()
+    table_content = scraper.fetch_stock_html_table(session,'http://stockcharts.com/h-hd/?RY.TO')
+    dataFrameFromRecord = scraper.parse_data_frame_from_html_table(table_content)
 
-    dataFrameFromRecord = pd.DataFrame.from_records(lineArray, columns=['Date', 'Open', 'High', 'Low', 'Close', 'Volume'])
-    dataFrameFromRecord.sort_index(ascending=True, axis=1)
-
-    io = StringIO(priceTablePart[0])
+    io = StringIO(table_content)
     f = open('data.csv', 'wt')
 
     try:
