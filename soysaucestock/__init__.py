@@ -11,7 +11,6 @@ import csv
 url = 'https://stockcharts.com/scripts/php/dblogin.php'
 stockchartlogin = {'form_UserID': 'YOUR_USERNAME@gmail.com', 'form_UserPassword': 'YOUR_PASSWORD'}
 
-
 if __name__ == '__main__':
     s = requests.Session()
     s.post(url, data=stockchartlogin)
@@ -22,20 +21,8 @@ if __name__ == '__main__':
 
     tableLines = priceTablePart[0].splitlines()
     #we only want data after the first 3 rows, split data into array of array
-    #lineArray = [tableRow.split() for tableRow in tableLines[3:]]
+    lineArray = [tableRow.split()[1:] for tableRow in filter(None, tableLines[3:])]
 
-    lineArray = []
-    index = 0
-	#remove the empty lines
-    for tableRow in filter(None, tableLines):
-        index += 1
-        if index not in [1, 2, 3]:
-            cells = tableRow.split()[1:]
-            #Do I need to parse to date type for the first column? Disable now
-            #parsedDateTimeValue = time.strptime(cells[0], "%m-%d-%Y")
-            #cells[0] = parsedDateTimeValue
-            lineArray.append(cells)
-    
     dataFrameFromRecord = pd.DataFrame.from_records(lineArray, columns=['Date', 'Open', 'High', 'Low', 'Close', 'Volume'])
     dataFrameFromRecord.sort_index(ascending=True, axis=1)
 
@@ -55,11 +42,11 @@ if __name__ == '__main__':
         f.close()
     df = pd.DataFrame.from_csv('data.csv', sep=",", parse_dates=True)
 
-	
+
 	#save both data frames to csv to validate if the data is correct, data identified
     dataFrameFromRecord.to_csv('dataFromMemory.csv', index=False)
     df.to_csv('df_FromCSV.csv')
-	
+
     #store = pd.HDFStore('data.h5')
     #store['price/RY_TO'] = df
     #store.close()
