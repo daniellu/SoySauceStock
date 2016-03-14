@@ -5,6 +5,7 @@ from lxml import html
 
 logger = logging.getLogger(__name__)
 
+
 class StockChartScraper(object):
 
     stock_chart_url = 'https://stockcharts.com/scripts/php/dblogin.php'
@@ -33,5 +34,6 @@ class StockChartScraper(object):
 
         data_frame_from_record = pd.DataFrame.from_records(line_array,
                                                            columns=['Date', 'Open', 'High', 'Low', 'Close', 'Volume'])
+        data_frame_from_record['Date'] = pd.to_datetime(data_frame_from_record['Date'])
         data_frame_from_record.sort_index(ascending=True, axis=1)
         return data_frame_from_record
