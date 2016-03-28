@@ -23,17 +23,24 @@ class StockChartScraper(object):
         return s
 
     @staticmethod
-    def save_stocks(stock_list, dest='C:\\temp', login_config_path='C:\\Tools\\stockchart.json'):
+    def save_stocks(stock_list, dest='C:\\temp', login_config_path='C:\\Tools\\stockchart.json', is_lazy_save=True):
         if type(stock_list) is not list:
             stock_list = [stock_list]
 
         s = StockChartScraper._login_stock_chart_site(login_config_path)
         for index in range(0, len(stock_list)):
-            ticker = stock_list[index]
-            html_table = StockChartScraper._fetch_stock_html_table(s, ticker)
-            df = StockChartScraper._parse_data_frame_from_html_table(html_table)
-            file_dest = os.path.join(dest, str.format('{0}.csv', ticker))
-            df.to_csv(file_dest, index=False, header=True)
+            ticker = stock_list[index].replace('/', '%2F')
+            file_dest = os.path.join(dest, str.format('{0}.csv', stock_list[index].replace('/', '.')))
+            if is_lazy_save and os.path.isfile(file_dest):
+                pass
+            else:
+                StockChartScraper._save_stock(s, ticker, file_dest)
+
+    @staticmethod
+    def _save_stock(s,ticker, file_dest):
+        html_table = StockChartScraper._fetch_stock_html_table(s, ticker)
+        df = StockChartScraper._parse_data_frame_from_html_table(html_table)
+        df.to_csv(file_dest, index=False, header=True)
 
     @staticmethod
     def _fetch_stock_html_table(login_session, ticker):
