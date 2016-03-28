@@ -55,16 +55,16 @@ class StockChartTester(object):
         file_period_name = trade.EnterDate.replace('-','_')
         enter_period = trade.EnterDate
         enter_one_year_back = add_years(enter_period, -1)
-        enter_file_name = os.path.join(dest, str.format('{0}_{1}_Entry.png', file_period_name, ticker.replace('/', '-')))
+        enter_file_name = os.path.join(dest, str.format('{0}_{1}_Entry.png', file_period_name, ticker.replace('/', '.')))
         exit_period = trade.ExitDate
         exit_one_year_back = add_years(exit_period, -1)
-        exit_file_name = os.path.join(dest, str.format('{0}_{1}_Exit.png', file_period_name, ticker.replace('/', '-')))
+        exit_file_name = os.path.join(dest, str.format('{0}_{1}_Exit.png', file_period_name, ticker.replace('/', '.')))
         p10_period = add_days(exit_period, 15) # two weeks
         p10_one_year_back = add_years(p10_period, -1)
-        p10_file_name = os.path.join(dest, str.format('{0}_{1}_Exit_p10.png', file_period_name, ticker.replace('/', '-')))
+        p10_file_name = os.path.join(dest, str.format('{0}_{1}_Exit_p10.png', file_period_name, ticker.replace('/', '.')))
         p30_period = add_days(exit_period, 90) # three months
         p30_one_year_back = add_years(p30_period, -1)
-        p30_file_name = os.path.join(dest, str.format('{0}_{1}_Exit_p30.png', file_period_name, ticker.replace('/', '-')))
+        p30_file_name = os.path.join(dest, str.format('{0}_{1}_Exit_p30.png', file_period_name, ticker.replace('/', '.')))
         self.save_pic(ticker, enter_one_year_back, enter_period, enter_file_name)
         self.save_pic(ticker, exit_one_year_back, exit_period, exit_file_name)
         self.save_pic(ticker, p10_one_year_back, p10_period, p10_file_name)
