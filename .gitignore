@@ -223,4 +223,5 @@ pip-log.txt
 # Project Specific
 setup.ini
 
+# ipython
 .ipynb_checkpoints
