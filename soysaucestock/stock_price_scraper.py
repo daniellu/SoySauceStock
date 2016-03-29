@@ -30,7 +30,7 @@ class StockChartScraper(object):
         s = StockChartScraper._login_stock_chart_site(login_config_path)
         for index in range(0, len(stock_list)):
             ticker = stock_list[index].replace('/', '%2F')
-            file_dest = os.path.join(dest, str.format('{0}.csv', stock_list[index].replace('/', '.')))
+            file_dest = os.path.join(dest, str.format('{0}.csv', stock_list[index].replace('/', '-')))
             if is_lazy_save and os.path.isfile(file_dest):
                 pass
             else:
