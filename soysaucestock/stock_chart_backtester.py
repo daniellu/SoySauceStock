@@ -258,7 +258,7 @@ class StockChartTester(object):
                            enter_ticker=ticker,
                            enter_price=entry_price,
                            initial_stop=init_stop,
-                           target_price=entry_price - 3 * (entry_price - init_stop),
+                           target_price=entry_price + 3 * (entry_price - init_stop),
                            enter_direction='Long',
                            exit_date=exit_date,
                            exit_price=exit_price,
